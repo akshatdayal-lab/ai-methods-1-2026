@@ -337,7 +337,7 @@ Check `git status` before committing to make sure you are not adding data or the
 | Problem | Fix |
 |---|---|
 | Submission folders are empty after cloning | `git submodule update --init --recursive` |
-| `git pull` fails because of local changes | Copy your edits elsewhere, then `git restore .` (or `git stash`) and pull again |
+| `git pull` fails because of local changes | Copy your  edits elsewhere, then `git restore .` (or `git stash`) and pull again |
 | `ModuleNotFoundError` in a notebook | The notebook is using the wrong kernel: select `.venv` / `ai-methods` in VS Code, or activate the environment and run `pip install -r requirements.txt` |
 | `python` is not found (Windows) | Reinstall Python and tick **Add python.exe to PATH**, or use `py` instead of `python` |
 | Cannot create a repository in iaac-maai | Accept the organization invitation (check your email or <https://github.com/iaac-maai>) and ask the maintainers for permission |
