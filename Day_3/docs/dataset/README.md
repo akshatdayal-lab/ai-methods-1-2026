@@ -11,6 +11,11 @@ tags:
   - clustering
   - iaac-maai
   - ai-methods-1
+configs:
+  - config_name: default
+    data_files:
+      - split: train
+        path: daily_load_profiles_clustered.csv
 ---
 
 # Daily household load profiles (Sceaux, 2006–2010), with typical-day clusters
@@ -39,7 +44,7 @@ This dataset is a derived work, released under the same licence (CC BY 4.0) with
 - **Aggregation:** one-minute readings → **hourly averages**. An hour with fewer than 45 valid minutes (out of 60) is treated as missing.
 - **Cleaning:** missing values (`?` in the original file) are ignored in the averages; only days with **all 24 hours** valid are kept: **1,411 days**.
 - **Feature engineering:** the daily energy use (`daily_kwh`) and calendar features (`weekday`, `weekend`, `month`, `season`).
-- **Clustering:** each day's 24-hour curve is divided by its own total (to compare **shapes**, not volumes) and grouped with K-Means into 4 typical-day profiles (`cluster`, `cluster_name`). The 2D map coordinates come from UMAP (`umap_x`, `umap_y`). Details, choice of k and stability checks: see the [model card](https://huggingface.co/iaac-maai/day3-example-load-profiles).
+- **Clustering:** each day's 24-hour curve is divided by its own total (to compare **shapes**, not volumes) and grouped with K-Means into 4 typical-day profiles (`cluster`, `cluster_name`). The day's position on three 2D maps of the curves is included (PCA, t-SNE and UMAP coordinates), so the clusters can be plotted without recomputing anything. Details, choice of k and stability checks: see the [model card](https://huggingface.co/iaac-maai/day3-example-load-profiles).
 
 ## What the clusters look like
 
@@ -58,6 +63,18 @@ The average day of each profile, in kW (computed from the `h00` … `h23` column
 
 **Right: the profiles through the year** (`month` and `cluster_name` columns). "Nobody home" makes up **55% of August** and 28% of July (summer holidays); "at home all day" is most common from **November to January** (34–41% of the days); the two workday profiles dominate the rest of the year.
 
+## Three maps of the same days
+
+![The days on the PCA, t-SNE and UMAP maps, coloured by cluster and by weekend](https://huggingface.co/datasets/iaac-maai/day3-example-daily-load-profiles/resolve/main/dataset_three_maps.png)
+
+The `pca_*`, `tsne_*` and `umap_*` columns place every day on three 2D maps of its 24-hour shape. Top row: coloured by `cluster_name`. Bottom row: coloured by `weekend`, a column that was **not** used for clustering.
+
+- **PCA** is a linear projection, so **its axes have a meaning**, read from the component loadings. **PC1** (21% of the variance) grows with a breakfast peak at 7:00, an evening peak at 19:00–22:00 and an empty middle of the day. **PC2** (15%) separates **morning-heavy** days (top) from **evening-heavy** days (bottom). The four profiles are **four slices of one round cloud**: "workday, empty house" on the right, "workday, home in the morning" at the top, "at home all day" at the bottom and "nobody home" (flat days) on the left. There are no gaps between them: K-Means cut a continuous cloud. Two components keep only 36% of the variance, so this map is a rough view.
+- **t-SNE and UMAP** keep neighbourhoods instead. The "nobody home" days form a **tight knot** (the holidays): the only group that is clearly set apart. The other borders stay fuzzy. On these maps the axes, the distances between groups and the group sizes mean nothing.
+- **Bottom row:** on all three maps the **weekends** gather where the "at home all day" days are, although `weekend` was never given to the algorithm. The clusters capture real behaviour. They are not the same thing, though: 39% of the "at home all day" days are weekdays (winter days at home, days off).
+
+To redraw any of these maps, see [How to load it](#how-to-load-it).
+
 ## Columns
 
 | Column | Type | Unit | Description |
@@ -71,14 +88,16 @@ The average day of each profile, in kW (computed from the `h00` … `h23` column
 | `season` | text | – | Meteorological season: winter (Dec–Feb), spring, summer, autumn |
 | `cluster` | integer | – | Typical-day profile assigned by the model (0–3) |
 | `cluster_name` | text | – | Name of the profile (our interpretation): `workday, home in the morning` (33.5% of days), `at home all day` (26.3%), `workday, empty house` (25.6%), `nobody home` (14.7%) |
-| `umap_x`, `umap_y` | float | – | Position of the day on a 2D UMAP map of the 24-hour shapes. Only useful for plotting: distances and cluster sizes on such maps are not meaningful |
+| `pca_x`, `pca_y` | float | – | Position of the day on the first two **principal components** of the 24-hour shapes (a linear projection: distances are roughly meaningful) |
+| `tsne_x`, `tsne_y` | float | – | Position of the day on a 2D **t-SNE** map of the shapes (`perplexity=30`). Only for plotting: distances between groups and group sizes are not meaningful |
+| `umap_x`, `umap_y` | float | – | Position of the day on a 2D **UMAP** map of the shapes (`n_neighbors=15`, `min_dist=0.1`). Only for plotting, with the same caveat as t-SNE |
 
 ## Limitations and biases
 
 - **One household.** These are the habits of one family in one house near Paris; they do not represent other households, building types or climates.
 - **Gaps.** Days with missing hours were removed, so some periods (including a few longer outages in the original data) are absent.
 - **The clusters are one reading of the data.** Daily habits form a continuum (silhouette ≈ 0.1); another algorithm or another number of clusters would draw the borders differently. The names are our interpretation of the curves and the calendar, not information about the occupants.
-- **The UMAP coordinates are not reproducible exactly** on another computer or library version.
+- **The t-SNE and UMAP coordinates are not reproducible exactly** on another computer or library version.
 
 ## How to load it
 
@@ -90,6 +109,14 @@ df = pd.read_csv(
     parse_dates=["date"],
 )
 df.groupby("cluster_name")["daily_kwh"].median()
+
+# Draw the clusters on any of the three maps: pca_x/pca_y, tsne_x/tsne_y or umap_x/umap_y
+import matplotlib.pyplot as plt
+
+for name, days in df.groupby("cluster_name"):
+    plt.scatter(days["umap_x"], days["umap_y"], s=8, label=name)
+plt.legend()
+plt.show()
 ```
 
 Reading `hf://` paths requires the `huggingface_hub` package.

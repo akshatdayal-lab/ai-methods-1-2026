@@ -1,5 +1,14 @@
 # ai-methods-1-2026
 
+[![Hugging Face][hf-badge]][hf-url] [![Models][hf-models-badge]][hf-models-url] [![Datasets][hf-datasets-badge]][hf-datasets-url]
+
+[hf-badge]: https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-iaac--maai-FFD21E
+[hf-url]: https://huggingface.co/iaac-maai
+[hf-models-badge]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fhuggingface.co%2Fapi%2Forganizations%2Fiaac-maai%2Foverview&query=%24.numModels&label=models&color=FFD21E&logo=huggingface
+[hf-models-url]: https://huggingface.co/iaac-maai?models
+[hf-datasets-badge]: https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fhuggingface.co%2Fapi%2Forganizations%2Fiaac-maai%2Foverview&query=%24.numDatasets&label=datasets&color=FFD21E&logo=huggingface
+[hf-datasets-url]: https://huggingface.co/iaac-maai?datasets
+
 General repository for **AI Methods I: Machine Learning for the Built Environment** (MaAI01, Term 1, IAAC).
 
 It contains the lecture notebooks for each day of the course and links every student submission through **git submodules**. Each student keeps their work in their own repository inside the [iaac-maai](https://github.com/iaac-maai) organization, and this repository only points to it. This avoids conflicts with branches and version control: nobody pushes to this repository except the course maintainers.
@@ -45,7 +54,9 @@ ai-methods-1-2026/
 | `Day_1/docs` | `data_cleaning_and_EDA.ipynb` | Data cleaning and Exploratory Data Analysis |
 | `Day_2/docs` | `application_of_supervised_learning.ipynb` | Supervised learning |
 | `Day_3/docs` | `application_of_unsupervised_learning.ipynb` | Unsupervised learning |
-| `Day_4/docs` | `Introduction_to_nn_and_cv.ipynb` | Introduction to neural networks and computer vision |
+| `Day_4/docs` | `01_nn_fundamentals_and_tensors.ipynb` | Neural network fundamentals: tensors, MLPs, training, regularisation (PyTorch) |
+| `Day_4/docs` | `02_computer_vision_opencv.ipynb` | Rule-based computer vision with OpenCV |
+| `Day_4/docs` | `03_object_detection_yolo_sam.ipynb` | Object detection and segmentation: fine-tuning YOLO, SAM |
 | `hackathon/docs` | `hackathon_cheat_sheet.ipynb` | Hackathon reference |
 
 > Notebooks are published on the day of each lecture. Until then they show an "under construction" message.

@@ -1,21 +1,23 @@
 # DAY_3 SUBMISSIONS
 
-## Assignment: an unsupervised learning analysis, published as a model (and a dataset)
+## Assignment: a clustered dataset, published with its model
 
-Find and **explain** structure in built-environment data with clustering and dimensionality reduction, and **publish** the result.
+Find and **explain** structure in built-environment data with clustering and dimensionality reduction, and **publish** the result as a new dataset.
 
 You deliver:
 
-1. A **GitHub repository** with a documented notebook that goes from data to **named, interpreted clusters**, structured like the Day 1 and Day 2 repositories.
-2. The **fitted model on Hugging Face**, inside the course organization, with a **model card**, so anyone can assign a new example to one of your groups.
-3. **Your dataset on Hugging Face, with a dataset card**, but **only if the dataset is your own work** (see [section 5.2](#52-the-dataset-publish-it-or-link-to-it)). Otherwise, a link to the original source is enough.
+1. **The clustered dataset (the main deliverable)**, on Hugging Face with a **dataset card**: your cleaned data and new features, plus a column with the **cluster** of every row, a column with the **name** your team gave each cluster, and the **2D coordinates** of your PCA and t-SNE / UMAP maps (see [section 5.1](#51-the-dataset-your-main-deliverable)).
+2. A **GitHub repository** with a documented notebook that goes from data to **named, interpreted clusters** and produces that dataset, structured like the Day 1 and Day 2 repositories.
+3. The **fitted model on Hugging Face**, with a **model card**, so anyone can assign a new example to one of your groups.
+
+💡 **Reference:** the class example [iaac-maai/day3-example-daily-load-profiles](https://huggingface.co/datasets/iaac-maai/day3-example-daily-load-profiles) shows what a finished dataset looks like (made in section 8 of the class notebook).
 
 This assignment applies what we did in class ([`Day_3/docs/application_of_unsupervised_learning.ipynb`](../docs/application_of_unsupervised_learning.ipynb)) to your own data. The natural starting point is the **cleaned dataset from your Day 1 or Day 2 assignment**.
 
 | | |
 |---|---|
 | **Work in** | Teams (as formed in class) |
-| **Deliverables** | One GitHub repository in the [iaac-maai GitHub organization](https://github.com/iaac-maai), one model repository in the [iaac-maai Hugging Face organization](https://huggingface.co/iaac-maai) and, if eligible, one dataset repository there too |
+| **Deliverables** | One **dataset repository** (the main deliverable) and one model repository in the [iaac-maai Hugging Face organization](https://huggingface.co/iaac-maai), and one GitHub repository in the [iaac-maai GitHub organization](https://github.com/iaac-maai) |
 | **Deadline** | **Monday, 2 November 2026, 23:59 CET** |
 | **How to hand in** | See [section 7 of the course README](../../README.md#7-hand-in-your-submission), and put the Hugging Face link(s) in your GitHub README |
 
@@ -67,6 +69,8 @@ Use the **cleaned dataset from your Day 1 or Day 2 assignment** if it suits an u
 
 Run them in that order. Your README must say so in *How to run*.
 
+⚠️ **Check the licence before you start.** You will publish a new version of the data, so the original licence must allow sharing derived data, and the data must contain no personal information (see [section 5.1](#51-the-dataset-your-main-deliverable)). If it does not, choose another dataset now, not the night before the deadline.
+
 ⚠️ **Do not use the three datasets from class** (house prices, energy efficiency and household power consumption). If you are unsure whether your problem is suitable, ask the course maintainers before you start.
 
 💡 **Tip:** unsupervised methods need **enough rows** (at least a few hundred for clustering individual examples) and **several meaningful numeric features**. A dataset with one interesting column will not give interesting clusters.
@@ -81,9 +85,9 @@ Your repository must contain this structure:
 <repo-name>/
 ├── data/
 │   └── .gitkeep                       # keeps the folder in git
-├── dataset/                           # ONLY if you publish your dataset (section 5.2)
+├── dataset/                           # the main deliverable (section 5.1)
 │   ├── README.md                      # the Hugging Face dataset card (committed)
-│   └── <dataset-name>.csv             # the published data (NOT committed: uploaded to Hugging Face)
+│   └── <dataset-name>.csv             # the clustered data (NOT committed: uploaded to Hugging Face)
 ├── figures/
 │   ├── 01_pca_explained_variance.png  # your exported plots
 │   └── ...
@@ -102,7 +106,7 @@ Your repository must contain this structure:
 | Item | What goes in it |
 |---|---|
 | `data/` | Same rules as Day 1: raw data is downloaded by the notebook, not committed. A small cleaned dataset (a few MB) may be committed. |
-| `dataset/` | Only if your dataset is eligible for publication: exactly what you upload to Hugging Face as a dataset. The dataset card (`README.md`) is committed; the data file lives **only** on Hugging Face. |
+| `dataset/` | **The main deliverable**: exactly what you upload to Hugging Face as a dataset. The dataset card (`README.md`, and any figures it shows) is committed; the data file lives **only** on Hugging Face. |
 | `figures/` | The key plots, exported by the notebook as `.png` files, **committed** and shown in your README. |
 | `models/` | Exactly what you upload to Hugging Face as a model: the model card (`README.md`, committed to GitHub) and the fitted pipeline (`model.joblib`, **only** on Hugging Face). |
 | `notebook/` | Your unsupervised learning notebook. If you switched to a new dataset, **also** the data cleaning and EDA notebook for it. Other extra notebooks are allowed if you explain them in the README. |
@@ -119,7 +123,7 @@ from pathlib import Path
 DATA_DIR = Path("..") / "data"
 FIG_DIR = Path("..") / "figures"
 MODEL_DIR = Path("..") / "models"
-DATASET_DIR = Path("..") / "dataset"   # only if you publish your dataset
+DATASET_DIR = Path("..") / "dataset"   # the clustered dataset you publish
 ```
 
 ---
@@ -143,6 +147,7 @@ The notebook must **run from top to bottom without errors** (*Restart kernel →
 **2. Dimensionality reduction**
 - **PCA**: the explained variance plot and a **reading of the loadings**. What does each of the first components mean? How many real dimensions does your data have?
 - **t-SNE or UMAP** (at least one) to draw the data in 2D. Comment on what it shows, keeping in mind that **cluster sizes and distances between groups in these plots are not meaningful**.
+- **Keep the 2D coordinates** of every map (PCA and t-SNE / UMAP): they become columns of your dataset (step 7).
 
 **3. Clustering**
 - **At least two algorithms**: K-Means **and** hierarchical clustering or DBSCAN / HDBSCAN.
@@ -155,7 +160,7 @@ The notebook must **run from top to bottom without errors** (*Restart kernel →
 **5. Interpretation (the most important section)**
 - **Profile** every cluster: size, and average (or median) values of the features.
 - **Cross-tabulate** the clusters with variables you did **not** cluster on (location, year, type, a performance measure…), as we did with the calendar in Application B and the heating load in Application A.
-- **Name** every cluster ("compact pre-1960 blocks", "evening-peak weekdays"…) in a summary table. If you cannot name a cluster, say so and discuss why.
+- **Name** every cluster ("compact pre-1960 blocks", "evening-peak weekdays"…) in a summary table, and **justify each name** with the profiles and cross-tabs above. These names go into your dataset. If you cannot name a cluster, say so and discuss why.
 - Plot the clusters on the PCA and/or t-SNE/UMAP projection.
 
 **6. Save and reuse the model**
@@ -174,10 +179,13 @@ assigner.fit(X, labels)            # X = the same feature columns you clustered 
 assigner.predict(new_example)      # -> the cluster of a new example
 ```
 
-**7. Conclusions**
+**7. Export the clustered dataset (the main deliverable)**
+- Build the final table with **every required column** of [section 5.1](#51-the-dataset-your-main-deliverable): cleaned data, engineered features, `cluster`, `cluster_name` and the 2D coordinates.
+- Save it to `dataset/<dataset-name>.csv`, and export the figures you show in the dataset card into `dataset/` as well.
+
+**8. Conclusions**
 - The **key findings** (3–6 bullet points, with numbers): which groups exist, how big they are, what distinguishes them.
 - **Limitations and biases**: data, choices (features, k), stability, and what the clusters should **not** be used for.
-- If you publish your dataset: export the final table (cleaned data + engineered features + cluster labels, see [section 5.3](#53-publish-your-dataset-only-if-eligible)) to `dataset/`.
 
 ### 3.2 Technical requirements
 
@@ -195,8 +203,8 @@ Someone who has never seen your project should understand it and be able to run 
 
 1. **Title** and **team members**.
 2. **Use case**: who uses the groups, for what (2–4 sentences).
-3. **On Hugging Face**: the link to your model repository and, if published, your dataset repository, at the top, impossible to miss.
-4. **Dataset**: name, link (to the original source **and** to your Hugging Face dataset if published), short description, licence.
+3. **On Hugging Face**: the links to your **dataset** and your model, at the top, impossible to miss.
+4. **Dataset**: name, links (to the original source **and** to your Hugging Face dataset), short description, licence.
 5. **Repository structure**: the folder tree with one line per item.
 6. **How to run**: environment, `requirements.txt`, data, notebook(s) and their order.
 7. **Approach**: unit of analysis, features used (and kept aside), preprocessing, methods compared.
@@ -226,8 +234,8 @@ A starting template:
 
 **Team:** Name Surname, Name Surname, Name Surname
 **Course:** AI Methods I – Day 3: Unsupervised learning (IAAC MaAI 2026/27)
+**Dataset on Hugging Face:** https://huggingface.co/datasets/iaac-maai/<dataset-repo>
 **Model on Hugging Face:** https://huggingface.co/iaac-maai/<model-repo>
-**Dataset on Hugging Face:** https://huggingface.co/datasets/iaac-maai/<dataset-repo>  <!-- or: "not published, see source below" -->
 
 ## Use case
 ...
@@ -243,7 +251,7 @@ A starting template:
 ## Repository structure
 ```
 ├── data/        # downloaded and cleaned data (not committed)
-├── dataset/     # dataset card (README.md); the data lives on Hugging Face   <!-- only if published -->
+├── dataset/     # dataset card (README.md) + its figures; the data lives on Hugging Face
 ├── figures/     # exported plots
 ├── models/      # model card (README.md); model.joblib lives on Hugging Face
 ├── notebook/    # unsupervised_learning.ipynb (+ data_cleaning_and_EDA.ipynb if new dataset)
@@ -298,7 +306,82 @@ You publish exactly as on Day 2. If you have not set up Hugging Face yet (accoun
 
 ⚠️ **Never put the token in your notebook, your code or your repository.**
 
-### 5.1 The model (always)
+### 5.1 The dataset: your main deliverable
+
+Your dataset is the **result** of the whole analysis: a table that anyone can download to study, reuse or map **your groups**, without running your notebook. It must contain these columns:
+
+| Columns | What | In the reference example |
+|---|---|---|
+| **Cleaned data** | Your rows after cleaning (Day 1 rules): consistent types, no duplicates, missing values handled | `date`, `h00` … `h23` (hourly kW) |
+| **Engineered features** | The new columns you created: aggregates, ratios, indicators, calendar or geometric features… | `daily_kwh`, `weekday`, `weekend`, `month`, `season` |
+| `cluster` | The cluster of every row, from your final model (`-1` = noise if you used DBSCAN) | `0` … `3` |
+| `cluster_name` | The **name your team gave each cluster** | `workday, empty house`, `nobody home` |
+| `pca_x`, `pca_y` | The row's position on the first two **principal components** | yes |
+| `tsne_x`, `tsne_y` **and/or** `umap_x`, `umap_y` | The row's position on your **t-SNE / UMAP** map (at least one; both are welcome) | yes, both |
+
+💡 **See the reference:** [iaac-maai/day3-example-daily-load-profiles](https://huggingface.co/datasets/iaac-maai/day3-example-daily-load-profiles). Open its *Dataset Viewer* to see every column.
+
+💡 **Tip:** if you compared two algorithms, you may add the second one's labels as an extra column (e.g. `cluster_ward`), so readers can see where they disagree.
+
+**The cluster names are the heart of the dataset.** They come from **your team's own interpretation** (profiles, cross-tabs, domain knowledge), not from the algorithm:
+- **Not:** `cluster A`, `group 1`, `high values`: these describe nothing.
+- **Yes:** `compact pre-1960 blocks`, `evening-peak weekdays`, `affordable satellite towns`: a reader understands the group without reading your notebook.
+- Every name must be **justified** in the notebook and summarised in the dataset card. If an AI tool suggested names, check them against your results and say so in the AI usage disclosure.
+
+**Why the coordinates?** They let anyone **redraw your maps** in two lines, coloured by `cluster_name`, without recomputing PCA, t-SNE or UMAP (and t-SNE / UMAP would not give exactly the same picture on another computer anyway).
+
+Build the table at the end of your notebook, for example:
+
+```python
+final = cleaned.copy()                                   # cleaned data + engineered features
+final["cluster"] = labels                                # from your final model
+final["cluster_name"] = final["cluster"].map(CLUSTER_NAMES)   # {0: "...", 1: "...", ...}: your names
+final[["pca_x", "pca_y"]] = pca_coordinates             # e.g. PCA(n_components=2).fit_transform(X_scaled)
+final[["umap_x", "umap_y"]] = umap_coordinates           # and/or tsne_x, tsne_y
+final.to_csv(DATASET_DIR / "<dataset-name>.csv", index=False)
+```
+
+**Licence and privacy.** You publish a **new version** of someone's data, so check before you start:
+
+| Situation | What to do |
+|---|---|
+| You **collected or created** the data yourselves (survey, your own scraping, sensors, a simulation you ran, digitised drawings) | Publish it under an open licence of your choice (e.g. CC BY 4.0) |
+| The original has an **open licence** that allows derived data: **CC BY**, **CC BY-SA**, **ODbL**, **CDLA**, public domain (CC0)… | Publish it **with attribution** to the original. *ShareAlike* licences (BY-SA, ODbL, CDLA-Sharing) require **the same licence** for your version |
+| The licence **forbids redistribution or derivatives** (*NoDerivatives*, "research use only"), or **no licence** is stated | You cannot publish it: **choose another dataset**, or ask the course maintainers |
+| The data contains **personal information** (names, addresses, identifiable households) | Remove it before publishing (drop or aggregate those columns); if that is not possible, choose another dataset |
+
+### 5.2 Publish the dataset
+
+Export it from the notebook as **CSV** (e.g. `dataset/<dataset-name>.csv`). Keep it reasonably small (a few hundred MB at most) and check once more that it contains **no personal data**.
+
+**Name** your dataset repository:
+
+```
+iaac-maai/day3-<team>-<dataset-name>
+```
+
+**Create and upload** (note `--type dataset` in **both** commands; without it, the files go to a *model* repository):
+
+```bash
+# 1. Create the dataset repository inside the organization
+hf repos create iaac-maai/day3-team3-barcelona-dwellings --type dataset --exist-ok
+
+# 2. Upload the contents of dataset/ (the data file + README.md) to the root of the repository
+hf upload iaac-maai/day3-team3-barcelona-dwellings dataset . --type dataset --commit-message "Upload dataset and dataset card"
+```
+
+The dataset page is at `https://huggingface.co/datasets/iaac-maai/<your-repo>` (note `/datasets/` in the address). Check that the **Dataset Viewer** shows your table and that the card renders correctly.
+
+**Test it like a stranger**: anyone with `pandas` and `huggingface_hub` installed can read it directly:
+
+```python
+import pandas as pd
+
+df = pd.read_csv("hf://datasets/iaac-maai/day3-team3-barcelona-dwellings/barcelona_dwellings.csv")
+df.head()
+```
+
+### 5.3 Publish the model
 
 **Name** your model repository with this pattern, all lowercase, with hyphens:
 
@@ -335,77 +418,25 @@ print(model.predict(example))       # -> the cluster number; your model card say
 
 If this fails (missing package, wrong scikit-learn version, missing column), fix it before the deadline. Delete `test_download/` afterwards; do not commit it.
 
-### 5.2 The dataset: publish it, or link to it?
-
-Publishing a dataset is a statement that **it is yours to share and worth sharing**. Re-uploading someone else's dataset with a few renamed columns is neither: it duplicates the original and hides who made it. Use this table:
-
-| Your situation | What to do |
-|---|---|
-| You **collected or created** the data yourselves (survey, your own scraping, sensors, a simulation you ran, digitised drawings or plans) | **Publish** it on Hugging Face |
-| You **transformed** an existing dataset **substantially**: merged several sources, **heavy cleaning**, substantial **imputation**, **feature engineering** that creates new information (e.g. daily profiles from minute readings, per-building indicators from raw records, geometric features from footprints) | **Publish** it on Hugging Face, with the original as source and attribution |
-| **Light cleaning** of a downloaded dataset (renamed columns, dropped rows or duplicates, fixed types, a few imputed values) | **Do not publish.** Link to the original dataset in your README and model card |
-| The original **licence does not allow redistribution** or derivatives (e.g. *NoDerivatives*, "for research use only", no licence stated) | **Do not publish**, even if your work is transformative. Link to the original |
-| The data contains **personal information** (names, addresses, identifiable households) | **Never publish** |
-
-⚠️ **Adding a cluster column is not enough to make a dataset new.** The transformation must be real work on the data itself. When in doubt, ask the course maintainers before uploading.
-
-💡 **Tip:** open licences such as **CC BY 4.0**, **CC BY-SA 4.0**, **ODbL** and **CDLA** allow publishing derived datasets **with attribution**; *ShareAlike* licences (BY-SA, ODbL, CDLA-Sharing) also require you to publish your version **under the same licence**. Write the original licence in your dataset card.
-
-### 5.3 Publish your dataset (only if eligible)
-
-**What to publish:** one table, the final result of your notebook. It contains:
-- the cleaned data and your **engineered features**;
-- your **cluster labels** (`cluster`, and `cluster_name` with the names from your interpretation);
-- optionally the 2D coordinates you plotted (`pca_1`, `pca_2` or `umap_x`, `umap_y`).
-
-Export it from the notebook as **CSV** (e.g. `dataset/<dataset-name>.csv`). Keep it reasonably small (a few hundred MB at most) and check once more that it contains **no personal data**.
-
-**Name** your dataset repository:
-
-```
-iaac-maai/day3-<team>-<dataset-name>
-```
-
-**Create and upload** (note `--type dataset` in **both** commands; without it, the files go to a *model* repository):
-
-```bash
-# 1. Create the dataset repository inside the organization
-hf repos create iaac-maai/day3-team3-barcelona-dwellings --type dataset --exist-ok
-
-# 2. Upload the contents of dataset/ (the data file + README.md) to the root of the repository
-hf upload iaac-maai/day3-team3-barcelona-dwellings dataset . --type dataset --commit-message "Upload dataset and dataset card"
-```
-
-The dataset page is at `https://huggingface.co/datasets/iaac-maai/<your-repo>` (note `/datasets/` in the address). Check that the **Dataset Viewer** shows your table and that the card renders correctly.
-
-**Test it like a stranger**: anyone with `pandas` and `huggingface_hub` installed can read it directly:
-
-```python
-import pandas as pd
-
-df = pd.read_csv("hf://datasets/iaac-maai/day3-team3-barcelona-dwellings/barcelona_dwellings.csv")
-df.head()
-```
-
 ---
 
 ## 6. The model card
 
 The model card is the `README.md` of your Hugging Face model repository (written in `models/README.md`, committed to GitHub, uploaded to Hugging Face). As on Day 2, it is the **user manual of your model**. For a clustering model, the most important part is the **meaning of each cluster**: a model that returns "cluster 3" is useless unless the card says what cluster 3 is.
 
-💡 **Tip:** the class folder [`Day_3/docs/`](../docs/) is organised exactly like your submission and contains a complete worked example: the fitted load-profile model with its model card ([`docs/models/README.md`](../docs/models/README.md)) and the published dataset with its dataset card ([`docs/dataset/README.md`](../docs/dataset/README.md)). Section 8 of the class notebook shows how they were produced.
+💡 **Tip:** the class folder [`Day_3/docs/`](../docs/) is organised exactly like your submission and contains a complete worked example: the fitted load-profile model with its model card ([`docs/models/README.md`](../docs/models/README.md)) and the published dataset with its dataset card ([`docs/dataset/README.md`](../docs/dataset/README.md), online at [day3-example-daily-load-profiles](https://huggingface.co/datasets/iaac-maai/day3-example-daily-load-profiles)). Section 8 of the class notebook shows how they were produced.
 
 ### 6.1 What it must contain
 
 | Section | What to write |
 |---|---|
-| **Metadata header** | Licence, library (`sklearn`), tags (including `clustering` / `unsupervised-learning`), and `datasets:` if you published your dataset |
+| **Metadata header** | Licence, library (`sklearn`), tags (including `clustering` / `unsupervised-learning`), and `datasets:` pointing to your Hugging Face dataset |
 | **Model summary** | One paragraph: what it groups, from what, for whom, with which algorithm |
 | **Intended use** | Who should use it and for what. **Out-of-scope uses**: where it must *not* be used (other cities, building types, value ranges…) |
 | **Model details** | Algorithm and key **hyperparameters** (k, eps / min_samples, linkage), preprocessing (scaling, PCA), the "assigner" if you used one (section 3.1, step 6), file format, library versions, authors |
 | **Input features** | A table: every input column, its type, unit, description and preprocessing. The **exact column names** the model expects |
 | **Output and clusters** | What `.predict()` returns, and a **table of the clusters**: number, **name**, size (share of the data), defining features. Mention noise (`-1`) if relevant |
-| **Training data** | Dataset name, **source link** (and your Hugging Face dataset if published), licence, size, what one row represents, coverage, a summary of the cleaning |
+| **Training data** | Dataset name, **source link** and your **Hugging Face dataset**, licence, size, what one row represents, coverage, a summary of the cleaning |
 | **Method and evaluation** | Algorithms compared; how k / eps was chosen (silhouette, elbow, dendrogram…); the agreement between methods and the **stability** check; why this model was chosen |
 | **Limitations and biases** | What the data does not represent, how sensitive the groups are to your choices, weak or unnamed clusters. Be honest: this is the most important section for a user |
 | **How to use** | A short, working Python snippet: download, load, assign a cluster to one example, and translate the number into the cluster name |
@@ -428,7 +459,7 @@ tags:
   - built-environment
   - iaac-maai
   - ai-methods-1
-datasets:                               # only if you published your dataset; otherwise delete these two lines
+datasets:                               # your clustered dataset on Hugging Face
   - iaac-maai/<dataset-repo>
 ---
 
@@ -480,7 +511,7 @@ The model expects a `pandas.DataFrame` with exactly these columns:
 | | |
 |---|---|
 | **Dataset** | ... |
-| **Source** | [link](...) <!-- + the Hugging Face dataset if published --> |
+| **Source** | [original](...) · [our clustered version](https://huggingface.co/datasets/iaac-maai/<dataset-repo>) |
 | **Licence** | ... |
 | **One row is** | ... |
 | **Size used** | ... rows |
@@ -538,19 +569,20 @@ Model released under the MIT License. The data is subject to its own licence: ..
 
 ## 7. The dataset card
 
-**Only if you publish your dataset.** The dataset card is the `README.md` of your Hugging Face dataset repository (written in `dataset/README.md`, committed to GitHub, uploaded to Hugging Face). It tells a reader **where the data comes from, what you did to it, and what every column means**, so they can reuse it without opening your notebook.
+The dataset card is the `README.md` of your Hugging Face dataset repository (written in `dataset/README.md`, committed to GitHub, uploaded to Hugging Face). It tells a reader **where the data comes from, what you did to it, and what every column means**, **and what your clusters mean**, so they can reuse it without opening your notebook.
 
 ### 7.1 What it must contain
 
 | Section | What to write |
 |---|---|
-| **Metadata header** | Licence (compatible with the original, see [5.2](#52-the-dataset-publish-it-or-link-to-it)), a readable name, size category, tags |
+| **Metadata header** | Licence (compatible with the original, see [5.1](#51-the-dataset-your-main-deliverable)), a readable name, size category, tags |
 | **Summary** | One paragraph: what the data describes, where, when, one row = ? |
 | **Source and attribution** | The **original dataset(s)**: name, link, authors, licence. Or how **you collected** the data |
 | **What we changed** | The cleaning, imputation and **feature engineering** you did, with numbers (rows removed, values imputed, features created). This paragraph shows why your version is **new** |
-| **Columns** | A table: every column, its type, unit and meaning, including the engineered features and `cluster` / `cluster_name` |
+| **The clusters** | A table of the clusters (number, **name**, size, defining features), **at least one figure** (e.g. the map coloured by `cluster_name`) and a short reading: how well separated are they, and what makes each one different? |
+| **Columns** | A table: every column, its type, unit and meaning, including the engineered features, `cluster`, `cluster_name` and the coordinate columns (with the method and its parameters) |
 | **Limitations and biases** | What the data does not represent, sampling bias, imputation effects, the clusters being one possible reading |
-| **How to load it** | A working snippet |
+| **How to load it** | A working snippet that loads the table and draws the clusters from the coordinate columns |
 | **Related** | Links to the GitHub repository and the model on Hugging Face |
 | **Authors and licence** | Team members, course, licence |
 
@@ -592,7 +624,18 @@ tags:
 - **Cleaning:** ...
 - **Imputation:** ...
 - **Feature engineering:** ...
-- **Clustering:** the `cluster` and `cluster_name` columns come from the model above.
+- **Clustering:** the `cluster` and `cluster_name` columns come from the model above; the coordinates from PCA and ... (t-SNE / UMAP).
+
+## The clusters
+
+![The clusters on the UMAP map](https://huggingface.co/datasets/iaac-maai/<dataset-repo>/resolve/main/<figure>.png)
+
+| Cluster | Name | Share of the rows | What makes it different |
+|---|---|---|---|
+| 0 | ... | ...% | ... |
+| 1 | ... | ...% | ... |
+
+<!-- A short reading: are the clusters well separated or a continuum? Which variables (also ones not clustered on) distinguish them? -->
 
 ## Columns
 
@@ -601,6 +644,8 @@ tags:
 | ... | numeric | m² | ... |
 | `cluster` | integer | – | Cluster number assigned by the model |
 | `cluster_name` | text | – | Name of the cluster (our interpretation) |
+| `pca_x`, `pca_y` | float | – | Position on the first two principal components |
+| `umap_x`, `umap_y` | float | – | Position on the UMAP map (`n_neighbors=...`, `min_dist=...`); only for plotting <!-- and/or tsne_x, tsne_y --> |
 
 ## Limitations and biases
 
@@ -612,6 +657,14 @@ tags:
 import pandas as pd
 
 df = pd.read_csv("hf://datasets/iaac-maai/<dataset-repo>/<file>.csv")
+
+# the clusters on the map
+import matplotlib.pyplot as plt
+
+for name, rows in df.groupby("cluster_name"):
+    plt.scatter(rows["umap_x"], rows["umap_y"], s=8, label=name)
+plt.legend()
+plt.show()
 ```
 
 ## Authors and licence
@@ -657,6 +710,8 @@ kaggle.json
 
 ⚠️ Do **not** ignore `figures/`, `*.png`, `models/README.md` or `dataset/README.md`: they must be on GitHub.
 
+💡 **Tip:** to show figures in a card both on Hugging Face and on GitHub, link them by their Hugging Face address: `https://huggingface.co/datasets/iaac-maai/<dataset-repo>/resolve/main/<figure>.png` (as the reference example does).
+
 ### `requirements.txt`
 
 Only the packages your notebook imports, **with versions**. This assignment adds scipy (dendrograms) and, if you use it, umap-learn, for example:
@@ -678,7 +733,7 @@ Pin **scikit-learn** exactly: a saved model may not load with another version, a
 
 ### `LICENSE`
 
-**MIT License** for your code and model, as before. The data keeps **its own licence**: mention it in the GitHub README, the model card and, if published, the dataset card (whose licence must be compatible with the original).
+**MIT License** for your code and model, as before. The data keeps **its own licence**: mention it in the GitHub README, the model card and the dataset card (whose licence must be compatible with the original).
 
 ---
 
@@ -686,7 +741,7 @@ Pin **scikit-learn** exactly: a saved model may not load with another version, a
 
 **GitHub repository**
 - [ ] The repository is inside the **iaac-maai** GitHub organization
-- [ ] It has `data/`, `figures/`, `models/` (with the model card), `notebook/`, `.gitignore`, `LICENSE`, `README.md` and `requirements.txt`, plus `dataset/` (with the dataset card) if you publish your dataset
+- [ ] It has `data/`, `dataset/` (with the dataset card), `figures/`, `models/` (with the model card), `notebook/`, `.gitignore`, `LICENSE`, `README.md` and `requirements.txt`
 - [ ] No virtual environment, raw data, `.joblib` model file, published data file or credentials are committed
 - [ ] The final version is pushed to `main` **before 2 November 2026**
 
@@ -698,22 +753,26 @@ Pin **scikit-learn** exactly: a saved model may not load with another version, a
 - [ ] It includes **PCA** (explained variance + loadings interpretation) and **t-SNE or UMAP**
 - [ ] It compares **at least two clustering algorithms**, with the choice of k / eps justified (elbow, silhouette, dendrogram or k-distance plot)
 - [ ] It checks the **stability** of the clusters
-- [ ] It **profiles and names** every cluster, using variables that were **not** clustered on
+- [ ] It **profiles and names** every cluster, using variables that were **not** clustered on, and justifies each name
+- [ ] It exports the clustered dataset to `dataset/` with all the required columns
 - [ ] It saves the pipeline to `models/model.joblib`, reloads it and assigns a cluster to a hand-made example
 - [ ] It exports at least 4 figures to `figures/`
+
+**Hugging Face dataset (the main deliverable)**
+- [ ] Published as `iaac-maai/day3-<team>-<dataset-name>` (a **dataset** repository), and the Dataset Viewer shows the table
+- [ ] It contains the cleaned data, your **engineered features**, `cluster`, `cluster_name`, `pca_x` / `pca_y` and `tsne_x` / `tsne_y` and/or `umap_x` / `umap_y` ([section 5.1](#51-the-dataset-your-main-deliverable))
+- [ ] Every cluster has a **meaningful name** that comes from your interpretation
+- [ ] A complete **dataset card** (every section of [7.1](#71-what-it-must-contain)), with the cluster table and at least one figure
+- [ ] The licence allows it, the original is credited, and there is no personal data
 
 **Hugging Face model**
 - [ ] The model repository is inside the **iaac-maai** Hugging Face organization and named `day3-<team>-<what-it-groups>`
 - [ ] It contains `model.joblib` and a complete **model card** (every section of [6.1](#61-what-it-must-contain)), including the **table of named clusters**
 - [ ] The model card links to the GitHub repository, and the GitHub README links to the model
-- [ ] It loads and assigns a cluster in a fresh folder ([section 5.1](#51-the-model-always))
-
-**Dataset**
-- [ ] **Either** the dataset is eligible ([section 5.2](#52-the-dataset-publish-it-or-link-to-it)) and published as `iaac-maai/day3-<team>-<dataset-name>`, with a complete **dataset card** (every section of [7.1](#71-what-it-must-contain)), a compatible licence, attribution and no personal data
-- [ ] **Or** it is not published, and the README and model card link to the original source
+- [ ] It loads and assigns a cluster in a fresh folder ([section 5.3](#53-publish-the-model))
 
 **README**
-- [ ] Team, use case, Hugging Face link(s), dataset, structure, how to run, approach, results (named clusters + at least 2 figures), limitations, AI usage disclosure, licence
+- [ ] Team, use case, Hugging Face links (dataset and model), dataset, structure, how to run, approach, results (named clusters + at least 2 figures), limitations, AI usage disclosure, licence
 
 ---
 
@@ -723,12 +782,13 @@ The assignment is graded following the course evaluation criteria (see the sylla
 
 | Criterion | What we look for |
 |---|---|
-| **Completeness** | All required files, sections and steps are present; the notebook runs; the model is published and loads; the dataset is published (if eligible) or properly linked |
-| **Interpretation** (main weight) | Clusters that are profiled, **named** and connected to variables that were not used to build them; a clear answer to the use-case question |
+| **The dataset** (main weight) | Clean, with meaningful **new features**; every row has a `cluster` and a **well-chosen, justified `cluster_name`**; coordinates to redraw the maps; a dataset card that explains the clusters with a table and figures; licence and attribution in order |
+| **Completeness** | All required files, sections and steps are present; the notebook runs; the dataset and the model are published and load |
+| **Interpretation** | Clusters that are profiled, **named** and connected to variables that were not used to build them; a clear answer to the use-case question |
 | **Methodology** | Features chosen on purpose, scaling, at least two algorithms compared fairly, a justified choice of k / eps, a stability check, dimensionality reduction used and read correctly |
-| **Critical thinking** | Honesty about weak structure (a low silhouette, unstable or unnamed clusters); t-SNE / UMAP plots not over-read; limitations and biases; correct reasoning about whether the dataset may be published |
+| **Critical thinking** | Honesty about weak structure (a low silhouette, unstable or unnamed clusters); t-SNE / UMAP plots not over-read; limitations and biases; the licence and privacy of the data checked |
 | **Communication** | Clear notebook, README, **model card** and dataset card that a stranger can follow; readable, labelled figures; an honest and useful AI usage disclosure |
 | **Relevance** | The question and the groups are meaningful for architecture and the built environment |
 | **Repository and publication conventions** | Clean structure, sensible `.gitignore`, pinned `requirements.txt`, licences, correct Hugging Face naming, metadata and repository types |
 
-A modest silhouette with a well-argued interpretation is worth more than a perfect score that nobody can explain.
+A modest silhouette with well-argued, well-named clusters is worth more than a perfect score that nobody can explain. Your dataset is how other people will meet your clusters: make it worth downloading.

@@ -441,9 +441,16 @@ FodyWeavers.xsd
 **.png
 
 # upcoming lectures
-Day_4/
 hackathon/
 
 # Others
 presentations/
 *.joblib
+# deep learning artefacts (Day 4): weights, videos, training runs, machine-specific dataset config
+*.pt
+*.onnx
+*.mp4
+*.webm
+**/runs/
+Day_4/docs/data/*
+!Day_4/docs/data/.gitkeep
